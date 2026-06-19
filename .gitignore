@@ -1,0 +1,10 @@
+# 生成レポート（個人の稼働状況を含むためローカルのみ。共有したい場合はこの行を外す）
+/reports/*
+!/reports/.gitkeep
+
+# Claude Code の一時出力
+.claude/tmp/
+
+# OS / エディタ
+.DS_Store
+*.swp
