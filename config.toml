@@ -1,0 +1,13 @@
+# メンバー活動モニタリングの設定
+
+[period]
+# 期間指定がない場合のデフォルト遡及日数
+default_days = 14
+
+[thresholds]
+# 全活動合計（4シグナルの和）がこれ以下 → critical（ほぼ無活動）
+critical_total_max = 0
+# 全活動合計がこれ未満 → warn
+warn_total_min = 3
+# 期間内 PR 作成数がこれ未満 → warn 要因に加える
+warn_pr_created_min = 1

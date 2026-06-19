@@ -2,6 +2,17 @@
 /reports/*
 !/reports/.gitkeep
 
+# ローカル DB と MCP 収集の中間 JSON（個人の稼働状況を含む）
+/data/*.db
+/data/*.db-*
+/data/incoming/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
 # Claude Code の一時出力
 .claude/tmp/
 

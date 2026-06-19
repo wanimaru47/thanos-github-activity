@@ -12,8 +12,34 @@ GitHub API のレート制限を気にせず活動情報を取得できる。Sno
 | パス | 役割 |
 |---|---|
 | `.mcp.json` | `thanos-management` MCP サーバへの接続設定（SSE / localhost:22930） |
-| `.claude/skills/` | レポート生成スキルの置き場 |
+| `.claude/skills/activity-monitor/` | 収集オーケストレーション skill（MCP→収集JSON→CLI 呼び出し） |
+| `src/activity_monitor/` | 決定的処理を担う Python CLI（ingest / detect / report） |
+| `config.toml` | 低活動検知の閾値設定 |
+| `data/` | ローカル SQLite と収集中間 JSON（`.gitignore` 済み） |
 | `reports/` | 生成レポートの出力先（`.gitignore` 済み。個人の稼働状況を含むためローカルのみ） |
+
+## activity-monitor（低活動メンバー検知）
+
+GitHub 活動を MCP(Snowflake) 経由で収集し、ローカル SQLite に履歴を蓄積して、
+極端に活動が少ないメンバーを絶対閾値で検知する。
+活動シグナルは USER_ID で確実に紐付く4種（PR作成 / PRレビュー / Issueコメント / PRレビューコメント）。
+
+```
+MCP(Snowflake) で収集 → 収集JSON → ingest(SQLite蓄積) → detect/report
+```
+
+- **skill**: Claude Code で `/activity-monitor [from] [to]` を実行（MCP収集〜レポートまで一気通貫）
+- **CLI**（skill が内部で呼ぶ。単体でも使える）:
+  ```bash
+  uv run activity-monitor init-db                              # DB 初期化
+  uv run activity-monitor ingest data/incoming/<収集>.json     # 取り込み（冪等）
+  uv run activity-monitor detect                               # warn/critical を表示
+  uv run activity-monitor report                               # reports/ に Markdown 出力
+  ```
+- 閾値は `config.toml` の `[thresholds]` で調整（`critical_total_max` / `warn_total_min` / `warn_pr_created_min`）
+- テスト: `uv run pytest`
+
+> 開発時 uv のキャッシュがサンドボックスで弾かれる場合は `export UV_CACHE_DIR="$TMPDIR/uv-cache"` を前置きする。
 
 ## 前提
 
